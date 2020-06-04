@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.ParcelUuid;
 import android.util.Log;
@@ -43,6 +44,7 @@ import java.util.UUID;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.location.LocationManagerCompat;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -240,6 +242,16 @@ public class FlutterBluePlugin implements FlutterPlugin, ActivityAware, MethodCa
 
             case "startScan":
             {
+
+                // Check is Location Service enabled
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    LocationManager lm = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
+                    Boolean isEnabled = LocationManagerCompat.isLocationEnabled(lm);
+                    result.error(
+                            "no_permissions", "user turn off it's location service", null);
+                    break;
+                }
+
                 if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(
